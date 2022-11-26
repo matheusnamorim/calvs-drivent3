@@ -56,6 +56,21 @@ async function ticketProcessPayment(ticketId: number) {
   });
 }
 
+async function findTicketWithStatus(enrollmentId: number) {
+  return prisma.ticket.findFirst({
+    where: {
+      AND: {
+        enrollmentId,
+        TicketType: {
+          isRemote: false,
+          includesHotel: true,
+        },
+        status: TicketStatus.PAID
+      }
+    },
+  });
+}
+
 export type CreateTicketParams = Omit<Ticket, "id" | "createdAt" | "updatedAt">
 
 const ticketRepository = {
@@ -65,6 +80,7 @@ const ticketRepository = {
   findTickeyById,
   findTickeWithTypeById,
   ticketProcessPayment,
+  findTicketWithStatus
 };
 
 export default ticketRepository;
