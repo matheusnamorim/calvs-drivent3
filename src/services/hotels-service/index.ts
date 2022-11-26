@@ -14,9 +14,8 @@ async function getHotels(userId: number): Promise<Hotel[]> {
   if(!ticket) {
     throw notFoundError();
   }
-
+  
   const result = await hotelsRepository.getHotels();
-
   return result;
 }
 

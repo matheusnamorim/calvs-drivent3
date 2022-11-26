@@ -60,7 +60,9 @@ async function findTicketWithStatus(enrollmentId: number) {
   return prisma.ticket.findFirst({
     where: {
       AND: {
-        enrollmentId,
+        Enrollment: {
+          userId: enrollmentId
+        },
         TicketType: {
           isRemote: false,
           includesHotel: true,
