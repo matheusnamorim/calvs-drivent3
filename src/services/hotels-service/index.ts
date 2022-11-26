@@ -19,8 +19,16 @@ async function getHotels(userId: number): Promise<Hotel[]> {
   return result;
 }
 
+async function getHotelsAndRooms(hotelId: number) {
+  const result = await hotelsRepository.getHotelsAndRooms(hotelId);
+  if(!result) throw notFoundError();
+
+  return result;
+}
+
 const hotelsService = {
-  getHotels
+  getHotels,
+  getHotelsAndRooms
 };
 
 export default hotelsService;
