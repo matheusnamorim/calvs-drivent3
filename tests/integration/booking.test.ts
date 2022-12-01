@@ -17,6 +17,7 @@ import {
   createTicketTypeRemote,
   createHotel,
   createRoomWithHotelId,
+  createBooking,
 } from "../factories";
 import { createRoom } from "../factories/room-factory";
 import { cleanDb, generateValidToken } from "../helpers";
@@ -63,26 +64,14 @@ describe("GET /booking", () => {
       const payment = await createPayment(ticket.id, ticketType.price);
       const createdHotel = await createHotel();
       const createdRoom = await createRoom(createdHotel.id);
-      await prisma.booking.create({
-        data: {
-          userId: user.id,
-          roomId: createdRoom.id
-        },
-      });
+      const createdBooking = await createBooking(user.id, createdRoom.id);
 
       const response = await server.get("/booking").set("Authorization", `Bearer ${token}`);
-      console.log(response.body);
       expect(response.status).toEqual(httpStatus.OK);
 
-    //   expect(response.body).toEqual([
-    //     {
-    //       id: createdHotel.id,
-    //       name: createdHotel.name,
-    //       image: createdHotel.image,
-    //       createdAt: createdHotel.createdAt.toISOString(),
-    //       updatedAt: createdHotel.updatedAt.toISOString()
-    //     }
-    //   ]);
+      expect(response.body).toEqual({
+        id: createdBooking.id
+      });
     });
   });
 });
