@@ -7,7 +7,7 @@ export async function getBooking(req: AuthenticatedRequest, res: Response) {
   const { userId } = req;
 
   try {
-    const result = await bookingService.listBooking();
+    const result = await bookingService.listBooking(userId);
     return res.status(httpStatus.OK).send(result);
   } catch (error) {
     return res.sendStatus(httpStatus.BAD_REQUEST);

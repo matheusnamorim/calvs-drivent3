@@ -1,7 +1,7 @@
 import bookingRepository from "@/repositories/booking-repository";
 
-async function listBooking() {
-  const result = await bookingRepository.findBooking();
+async function listBooking(userId: number) {
+  const result = await bookingRepository.findBooking(userId);
   return result;
 }
 
