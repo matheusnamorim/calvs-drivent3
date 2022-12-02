@@ -29,4 +29,21 @@ export type RequestError = {
   statusText: string,
   name: string,
   message: string,
-};
+}
+
+export type Booking = {
+  createdAt: Date,
+  id: number,
+  roomId: number,
+  updatedAt: Date,
+  userId: number,
+}
+
+export type Room = {
+  capacity: number,
+  createdAt: Date,
+  hotelId: number,
+  id: number,
+  name: string,
+  updatedAt: Date,
+}
