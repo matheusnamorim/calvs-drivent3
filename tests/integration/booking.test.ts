@@ -55,6 +55,17 @@ describe("GET /booking", () => {
   });
 
   describe("when token is valid", () => {
+    it("should respond with status 404 when user has no reserved", async () => {
+      const user = await createUser();
+      const token = await generateValidToken(user);
+      const enrollment = await createEnrollmentWithAddress(user);
+      const ticketType = await createTicketTypeWithHotel();
+      const ticket = await createTicket(enrollment.id, ticketType.id, TicketStatus.PAID);
+
+      const response = await server.get("/booking").set("Authorization", `Bearer ${token}`);
+      expect(response.status).toBe(httpStatus.NOT_FOUND);
+    });
+
     it("should respond with status 200 and a list of booking", async () => {
       const user = await createUser();
       const token = await generateValidToken(user);
@@ -70,7 +81,13 @@ describe("GET /booking", () => {
       expect(response.status).toEqual(httpStatus.OK);
 
       expect(response.body).toEqual({
-        id: createdBooking.id
+        id: createdBooking.id,
+        Room: {
+          id: createdRoom.id,
+          capacity: createdRoom.capacity,
+          hotelId: createdRoom.hotelId,
+          name: createdRoom.name
+        }
       });
     });
   });
