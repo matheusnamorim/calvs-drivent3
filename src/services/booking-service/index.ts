@@ -44,13 +44,14 @@ async function addBooking(userId: number, roomId: number) {
 }
 
 async function updateBooking(userId: number, bookingId: number, roomId: number) {
-  if(!bookingId || isNaN(bookingId) || bookingId <= 0) throw forbiddenError();
+  const booking = await bookingRepository.findBookingById(bookingId);
+  if(!booking) throw notFoundError();
 
-  const result = await bookingRepository.findRoomId(roomId);
-  if(!result) throw notFoundError();
+  const resultRoom = await bookingRepository.findRoomId(roomId);
+  if(!resultRoom) throw notFoundError();
 
   const bookings = await bookingRepository.findManyBooking(roomId);
-  if(result.capacity === bookings.length) throw forbiddenError();
+  if(resultRoom.capacity === bookings.length) throw forbiddenError();
 
   return;
 }

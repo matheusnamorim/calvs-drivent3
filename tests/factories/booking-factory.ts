@@ -18,3 +18,12 @@ export async function createManyBooking(userId: number, roomId: number) {
     ]
   });
 }
+
+export async function createTwoBooking(userId: number, roomId: number) {
+  return prisma.booking.createMany({
+    data: [
+      { userId, roomId, },
+      { userId, roomId, },
+    ]
+  });
+}

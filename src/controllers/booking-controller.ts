@@ -2,6 +2,7 @@ import bookingService from "@/services/booking-service";
 import { Response } from "express";
 import { AuthenticatedRequest } from "@/middlewares";
 import httpStatus from "http-status";
+import { forbiddenError } from "@/errors";
 
 export async function getBooking(req: AuthenticatedRequest, res: Response) {
   const { userId } = req;
@@ -40,6 +41,8 @@ export async function updateBooking(req: AuthenticatedRequest, res: Response) {
   const { roomId } = req.body;
 
   try {
+    if(!bookingId || isNaN(Number(bookingId)) || Number(bookingId) < 0) throw forbiddenError();
+
     const result = await bookingService.updateBooking(userId, Number(bookingId), roomId);
     return res.status(httpStatus.OK).send(result);
   } catch (error) {

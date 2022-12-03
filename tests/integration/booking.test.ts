@@ -19,6 +19,7 @@ import {
   createRoomWithHotelId,
   createBooking,
   createManyBooking,
+  createTwoBooking,
 } from "../factories";
 import { cleanDb, generateValidToken } from "../helpers";
 
@@ -271,10 +272,21 @@ describe("PUT /booking/:bookingId", () => {
       const createdHotel = await createHotel();
       const createdRoom = await createRoomWithHotelId(createdHotel.id);
       const userFake = await createUser();
-      await createManyBooking(userFake.id, createdRoom.id);
+      const createdBooking = await createBooking(user.id, createdRoom.id);
+      await createTwoBooking(userFake.id, createdRoom.id);
       const body = { roomId: createdRoom.id };
 
-      const response = await server.put("/booking/1").set("Authorization", `Bearer ${token}`).send(body);
+      const response = await server.put(`/booking/${createdBooking.id}`).set("Authorization", `Bearer ${token}`).send(body);
+
+      expect(response.status).toBe(httpStatus.FORBIDDEN);
+    });
+
+    it("should respond with status 403 when booking is not valid", async () => {
+      const user = await createUser();
+      const token = await generateValidToken(user);
+      const body = { roomId: 1 };
+
+      const response = await server.put(`/booking/${faker.lorem.word()}`).set("Authorization", `Bearer ${token}`).send(body);
 
       expect(response.status).toBe(httpStatus.FORBIDDEN);
     });
@@ -282,14 +294,11 @@ describe("PUT /booking/:bookingId", () => {
     it("should respond with status 403 when booking not exists", async () => {
       const user = await createUser();
       const token = await generateValidToken(user);
-      const enrollment = await createEnrollmentWithAddress(user);
-      const ticketType = await createTicketTypeWithHotel();
-      const ticket = await createTicket(enrollment.id, ticketType.id, TicketStatus.PAID);
       const body = { roomId: 1 };
 
       const response = await server.put("/booking/0").set("Authorization", `Bearer ${token}`).send(body);
 
-      expect(response.status).toBe(httpStatus.FORBIDDEN);
+      expect(response.status).toBe(httpStatus.NOT_FOUND);
     });
   });
 });
