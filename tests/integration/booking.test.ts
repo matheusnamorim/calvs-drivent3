@@ -18,8 +18,8 @@ import {
   createHotel,
   createRoomWithHotelId,
   createBooking,
+  createManyBooking,
 } from "../factories";
-import { createRoom } from "../factories/room-factory";
 import { cleanDb, generateValidToken } from "../helpers";
 
 beforeAll(async () => {
@@ -74,7 +74,7 @@ describe("GET /booking", () => {
       const ticket = await createTicket(enrollment.id, ticketType.id, TicketStatus.PAID);
       const payment = await createPayment(ticket.id, ticketType.price);
       const createdHotel = await createHotel();
-      const createdRoom = await createRoom(createdHotel.id);
+      const createdRoom = await createRoomWithHotelId(createdHotel.id);
       const createdBooking = await createBooking(user.id, createdRoom.id);
 
       const response = await server.get("/booking").set("Authorization", `Bearer ${token}`);
@@ -116,7 +116,7 @@ describe("POST /booking", () => {
   });
 
   describe("when token is valid", () => {
-    it("should respond with status 400 when body is not present", async () => {
+    it("should respond with status 403 when body is not present", async () => {
       const user = await createUser();
       const token = await generateValidToken(user);
 
@@ -125,7 +125,7 @@ describe("POST /booking", () => {
       expect(response.status).toBe(httpStatus.BAD_REQUEST);
     });
 
-    it("should respond with status 400 when body is not valid", async () => {
+    it("should respond with status 403 when body is not valid", async () => {
       const user = await createUser();
       const token = await generateValidToken(user);
       const body = { [faker.lorem.word()]: faker.lorem.word() };
@@ -135,12 +135,30 @@ describe("POST /booking", () => {
       expect(response.status).toBe(httpStatus.BAD_REQUEST);
     });
 
-    it("should respond with status 404 when roomId not found", async () => {
+    it("should respond with status 404 when room not exists", async () => {
       const user = await createUser();
       const token = await generateValidToken(user);
       const body = { roomId: 0 };
 
       const response = await server.post("/booking").set("Authorization", `Bearer ${token}`).send(body);
+
+      expect(response.status).toBe(httpStatus.BAD_REQUEST);
+    });
+
+    it("should respond with status 404 when room not space", async () => {
+      const user = await createUser();
+      const token = await generateValidToken(user);
+      const enrollment = await createEnrollmentWithAddress(user);
+      const ticketType = await createTicketTypeWithHotel();
+      const ticket = await createTicket(enrollment.id, ticketType.id, TicketStatus.PAID);
+      const payment = await createPayment(ticket.id, ticketType.price);
+      const createdHotel = await createHotel();
+      const createdRoom = await createRoomWithHotelId(createdHotel.id);
+      const userFake = await createUser();
+      const result = await createManyBooking(userFake.id, createdRoom.id);
+      console.log(result);
+
+      const response = await server.post("/booking").set("Authorization", `Bearer ${token}`);
 
       expect(response.status).toBe(httpStatus.BAD_REQUEST);
     });

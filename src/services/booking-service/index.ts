@@ -15,8 +15,8 @@ async function listBooking(userId: number): Promise<resultBooking> {
   };
 }
 
-async function addBooking(roomId: number) {
-  await validateRoomId(roomId);
+async function addBooking(userId: number, roomId: number) {
+  await validateRoomId(userId, roomId);
   return;
 }
 
@@ -24,7 +24,7 @@ type resultBooking = Omit<Booking, "userId" | "createdAt" | "updatedAt" | "roomI
   Room: Omit<Room, "createdAt" | "updatedAt">
 };
 
-async function validateRoomId(roomId: number) {
+async function validateRoomId(userId: number, roomId: number) {
   const result = await bookingRepository.findRoomId(roomId);
   if(!result) throw notFoundError();
 }
