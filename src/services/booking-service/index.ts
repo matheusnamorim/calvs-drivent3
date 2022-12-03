@@ -1,4 +1,4 @@
-import { notFoundError } from "@/errors";
+import { forbiddenError, notFoundError } from "@/errors";
 import { Booking, Room } from "@/protocols";
 import bookingRepository from "@/repositories/booking-repository";
 import { exclude } from "@/utils/prisma-utils";
@@ -16,7 +16,7 @@ async function listBooking(userId: number): Promise<resultBooking> {
 }
 
 async function addBooking(userId: number, roomId: number) {
-  await validateRoomId(userId, roomId);
+  await validateRoomId(roomId);
   return;
 }
 
@@ -24,9 +24,12 @@ type resultBooking = Omit<Booking, "userId" | "createdAt" | "updatedAt" | "roomI
   Room: Omit<Room, "createdAt" | "updatedAt">
 };
 
-async function validateRoomId(userId: number, roomId: number) {
+async function validateRoomId(roomId: number) {
   const result = await bookingRepository.findRoomId(roomId);
   if(!result) throw notFoundError();
+
+  const bookings = await bookingRepository.findManyBooking(roomId);
+  if(result.capacity === bookings.length) throw forbiddenError();
 }
 
 const bookingService = {

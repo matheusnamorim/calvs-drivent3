@@ -95,14 +95,14 @@ describe("GET /booking", () => {
 
 describe("POST /booking", () => {
   it("should respond with status 401 if no token is given", async () => {
-    const response = await server.get("/booking");
+    const response = await server.post("/booking");
     expect(response.status).toBe(httpStatus.UNAUTHORIZED);
   });
 
   it("should respond with status 401 if given token is not valid", async () => {
     const token = faker.lorem.word();
 
-    const response = await server.get("/booking").set("Authorization", `Bearer ${token}`);
+    const response = await server.post("/booking").set("Authorization", `Bearer ${token}`);
 
     expect(response.status).toBe(httpStatus.UNAUTHORIZED);
   });
@@ -110,7 +110,7 @@ describe("POST /booking", () => {
     const userWithoutSession = await createUser();
     const token = jwt.sign({ userId: userWithoutSession.id }, process.env.JWT_SECRET);
 
-    const response = await server.get("/booking").set("Authorization", `Bearer ${token}`);
+    const response = await server.post("/booking").set("Authorization", `Bearer ${token}`);
 
     expect(response.status).toBe(httpStatus.UNAUTHORIZED);
   });
@@ -155,10 +155,10 @@ describe("POST /booking", () => {
       const createdHotel = await createHotel();
       const createdRoom = await createRoomWithHotelId(createdHotel.id);
       const userFake = await createUser();
-      const result = await createManyBooking(userFake.id, createdRoom.id);
-      console.log(result);
+      await createManyBooking(userFake.id, createdRoom.id);
+      const body = { roomId: createdRoom.id };
 
-      const response = await server.post("/booking").set("Authorization", `Bearer ${token}`);
+      const response = await server.post("/booking").set("Authorization", `Bearer ${token}`).send(body);
 
       expect(response.status).toBe(httpStatus.BAD_REQUEST);
     });

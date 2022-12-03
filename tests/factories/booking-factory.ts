@@ -11,9 +11,10 @@ export async function createBooking(userId: number, roomId: number) {
 
 export async function createManyBooking(userId: number, roomId: number) {
   return prisma.booking.createMany({
-    data: {
-      userId, 
-      roomId,
-    }
+    data: [
+      { userId, roomId, },
+      { userId, roomId, },
+      { userId, roomId, },
+    ]
   });
 }
