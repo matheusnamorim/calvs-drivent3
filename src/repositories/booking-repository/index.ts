@@ -11,8 +11,17 @@ async function findBooking(userId: number) {
   });
 }
 
+async function findRoomId(roomId: number) {
+  return prisma.room.findFirst({
+    where: {
+      id: roomId
+    },
+  });
+}
+
 const bookingRepository = {
   findBooking,
+  findRoomId
 };
 
 export default bookingRepository;

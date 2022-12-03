@@ -15,13 +15,19 @@ async function listBooking(userId: number): Promise<resultBooking> {
   };
 }
 
-async function addBooking() {
+async function addBooking(roomId: number) {
+  await validateRoomId(roomId);
   return;
 }
 
 type resultBooking = Omit<Booking, "userId" | "createdAt" | "updatedAt" | "roomId"> & {
   Room: Omit<Room, "createdAt" | "updatedAt">
 };
+
+async function validateRoomId(roomId: number) {
+  const result = await bookingRepository.findRoomId(roomId);
+  if(!result) throw notFoundError();
+}
 
 const bookingService = {
   listBooking,

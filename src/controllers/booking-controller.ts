@@ -19,9 +19,9 @@ export async function getBooking(req: AuthenticatedRequest, res: Response) {
 
 export async function postBooking(req: AuthenticatedRequest, res: Response) {
   // const { userId } = req;
-  
+  const { roomId } = req.body;
   try {
-    const result = await bookingService.addBooking();
+    const result = await bookingService.addBooking(roomId);
     return res.status(httpStatus.OK).send(result);
   } catch (error) {
     return res.sendStatus(httpStatus.BAD_REQUEST);

@@ -127,8 +127,18 @@ describe("POST /booking", () => {
 
     it("should respond with status 400 when body is not valid", async () => {
       const user = await createUser();
-      const token = await generateValidToken();
+      const token = await generateValidToken(user);
       const body = { [faker.lorem.word()]: faker.lorem.word() };
+
+      const response = await server.post("/booking").set("Authorization", `Bearer ${token}`).send(body);
+
+      expect(response.status).toBe(httpStatus.BAD_REQUEST);
+    });
+
+    it("should respond with status 404 when roomId not found", async () => {
+      const user = await createUser();
+      const token = await generateValidToken(user);
+      const body = { roomId: 0 };
 
       const response = await server.post("/booking").set("Authorization", `Bearer ${token}`).send(body);
 
