@@ -24,6 +24,12 @@ export async function postBooking(req: AuthenticatedRequest, res: Response) {
     const result = await bookingService.addBooking(userId, roomId);
     return res.status(httpStatus.OK).send(result);
   } catch (error) {
-    return res.sendStatus(httpStatus.BAD_REQUEST);
+    if (error.name === "Forbidden") {
+      return res.sendStatus(httpStatus.FORBIDDEN);
+    }
+
+    if (error.name === "NotFoundError") {
+      return res.sendStatus(httpStatus.NOT_FOUND);
+    }
   }
 }

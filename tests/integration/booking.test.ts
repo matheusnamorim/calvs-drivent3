@@ -122,7 +122,7 @@ describe("POST /booking", () => {
 
       const response = await server.post("/booking").set("Authorization", `Bearer ${token}`);
 
-      expect(response.status).toBe(httpStatus.BAD_REQUEST);
+      expect(response.status).toBe(httpStatus.FORBIDDEN);
     });
 
     it("should respond with status 403 when body is not valid", async () => {
@@ -132,20 +132,21 @@ describe("POST /booking", () => {
 
       const response = await server.post("/booking").set("Authorization", `Bearer ${token}`).send(body);
 
-      expect(response.status).toBe(httpStatus.BAD_REQUEST);
+      expect(response.status).toBe(httpStatus.FORBIDDEN);
     });
 
     it("should respond with status 404 when room not exists", async () => {
       const user = await createUser();
       const token = await generateValidToken(user);
+      const enrollment = await createEnrollmentWithAddress(user);
       const body = { roomId: 0 };
 
       const response = await server.post("/booking").set("Authorization", `Bearer ${token}`).send(body);
 
-      expect(response.status).toBe(httpStatus.BAD_REQUEST);
+      expect(response.status).toBe(httpStatus.NOT_FOUND);
     });
 
-    it("should respond with status 404 when room not space", async () => {
+    it("should respond with status 403 when room not space", async () => {
       const user = await createUser();
       const token = await generateValidToken(user);
       const enrollment = await createEnrollmentWithAddress(user);
@@ -160,7 +161,16 @@ describe("POST /booking", () => {
 
       const response = await server.post("/booking").set("Authorization", `Bearer ${token}`).send(body);
 
-      expect(response.status).toBe(httpStatus.BAD_REQUEST);
+      expect(response.status).toBe(httpStatus.FORBIDDEN);
+    });
+
+    it("should respond with status 403 when user not enrollment", async () => {
+      const token = await generateValidToken();
+      const body = { roomId: 1 };
+
+      const response = await server.post("/booking").set("Authorization", `Bearer ${token}`).send(body);
+
+      expect(response.status).toBe(httpStatus.FORBIDDEN);
     });
   });
 });
