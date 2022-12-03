@@ -37,9 +37,10 @@ export async function postBooking(req: AuthenticatedRequest, res: Response) {
 export async function updateBooking(req: AuthenticatedRequest, res: Response) {
   const { userId } = req;
   const { bookingId } = req.params;
+  const { roomId } = req.body;
 
   try {
-    const result = await bookingService.updateBooking(userId, Number(bookingId));
+    const result = await bookingService.updateBooking(userId, Number(bookingId), roomId);
     return res.status(httpStatus.OK).send(result);
   } catch (error) {
     if (error.name === "Forbidden") {
