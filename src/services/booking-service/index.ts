@@ -21,7 +21,7 @@ type resultBooking = Omit<Booking, "userId" | "createdAt" | "updatedAt" | "roomI
   Room: Omit<Room, "createdAt" | "updatedAt">
 };
 
-async function addBooking(userId: number, roomId: number): Promise<postBooking> {
+async function addBooking(userId: number, roomId: number) {
   const resultEnrollment = await enrollmentRepository.findWithAddressByUserId(userId);
   if(!resultEnrollment) throw forbiddenError();
 
@@ -36,11 +36,12 @@ async function addBooking(userId: number, roomId: number): Promise<postBooking> 
   const bookings = await bookingRepository.findManyBooking(roomId);
   if(result.capacity === bookings.length) throw forbiddenError();
 
-  const resultBooking = await bookingRepository.createBooking(userId, roomId);
-  return { ...exclude(resultBooking, "userId", "createdAt", "updatedAt", "roomId"), };
+  const booking = await bookingRepository.createBooking(userId, roomId);
+  const resultBooking = { ...exclude(booking, "userId", "createdAt", "updatedAt", "roomId"), };
+  return {
+    bookingId: resultBooking.id
+  };
 }
-
-type postBooking = Omit<Booking, "userId" | "createdAt" | "updatedAt" | "roomId">;
 
 const bookingService = {
   listBooking,

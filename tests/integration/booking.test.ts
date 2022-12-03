@@ -200,7 +200,7 @@ describe("POST /booking", () => {
       const response = await await server.post("/booking").set("Authorization", `Bearer ${token}`).send(body);
       expect(response.status).toBe(httpStatus.OK);
       expect(response.body).toEqual({
-        id: expect.any(Number),
+        bookingId: expect.any(Number),
       });
     });
   });
