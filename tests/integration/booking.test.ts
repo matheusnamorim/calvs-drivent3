@@ -139,6 +139,8 @@ describe("POST /booking", () => {
       const user = await createUser();
       const token = await generateValidToken(user);
       const enrollment = await createEnrollmentWithAddress(user);
+      const ticketType = await createTicketTypeWithHotel();
+      const ticket = await createTicket(enrollment.id, ticketType.id, TicketStatus.PAID);
       const body = { roomId: 0 };
 
       const response = await server.post("/booking").set("Authorization", `Bearer ${token}`).send(body);
@@ -166,6 +168,17 @@ describe("POST /booking", () => {
 
     it("should respond with status 403 when user not enrollment", async () => {
       const token = await generateValidToken();
+      const body = { roomId: 1 };
+
+      const response = await server.post("/booking").set("Authorization", `Bearer ${token}`).send(body);
+
+      expect(response.status).toBe(httpStatus.FORBIDDEN);
+    });
+
+    it("should respond with status 403 when ticket is not valid", async () => {
+      const user = await createUser();
+      const token = await generateValidToken(user);
+      const enrollment = await createEnrollmentWithAddress(user);
       const body = { roomId: 1 };
 
       const response = await server.post("/booking").set("Authorization", `Bearer ${token}`).send(body);
