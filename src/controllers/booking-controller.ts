@@ -16,3 +16,14 @@ export async function getBooking(req: AuthenticatedRequest, res: Response) {
     return res.sendStatus(httpStatus.BAD_REQUEST);
   }
 }
+
+export async function postBooking(req: AuthenticatedRequest, res: Response) {
+  // const { userId } = req;
+  
+  try {
+    const result = await bookingService.addBooking();
+    return res.status(httpStatus.OK).send(result);
+  } catch (error) {
+    return res.sendStatus(httpStatus.BAD_REQUEST);
+  }
+}

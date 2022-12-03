@@ -25,4 +25,8 @@ function validate(schema: ObjectSchema, type: "body" | "params") {
   };
 }
 
+export function validateRoomId(): ValidationMiddleware {
+  return;
+}
+
 type ValidationMiddleware = (req: Request, res: Response, next: NextFunction)=> void;

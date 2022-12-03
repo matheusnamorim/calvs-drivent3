@@ -15,12 +15,17 @@ async function listBooking(userId: number): Promise<resultBooking> {
   };
 }
 
+async function addBooking() {
+  return;
+}
+
 type resultBooking = Omit<Booking, "userId" | "createdAt" | "updatedAt" | "roomId"> & {
   Room: Omit<Room, "createdAt" | "updatedAt">
 };
 
 const bookingService = {
   listBooking,
+  addBooking,
 };
 
 export default bookingService;
