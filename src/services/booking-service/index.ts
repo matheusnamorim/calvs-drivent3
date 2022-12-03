@@ -43,9 +43,15 @@ async function addBooking(userId: number, roomId: number) {
   };
 }
 
+async function updateBooking(userId: number, bookingId: number) {
+  const body = { userId, bookingId, };
+  return body;
+}
+
 const bookingService = {
   listBooking,
   addBooking,
+  updateBooking
 };
 
 export default bookingService;
