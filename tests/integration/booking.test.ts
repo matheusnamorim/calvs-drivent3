@@ -300,5 +300,44 @@ describe("PUT /booking/:bookingId", () => {
 
       expect(response.status).toBe(httpStatus.NOT_FOUND);
     });
+
+    it("should respond with status 403 when user not had this the booking", async () => {
+      const user = await createUser();
+      const token = await generateValidToken(user);
+      const enrollment = await createEnrollmentWithAddress(user);
+      const ticketType = await createTicketTypeWithHotel();
+      const ticket = await createTicket(enrollment.id, ticketType.id, TicketStatus.PAID);
+      const payment = await createPayment(ticket.id, ticketType.price);
+      const createdHotel = await createHotel();
+      const createdRoom = await createRoomWithHotelId(createdHotel.id);
+      const userFake = await createUser();
+      const createdBooking = await createBooking(userFake.id, createdRoom.id);
+      const body = { roomId: createdRoom.id };
+
+      const response = await server.put(`/booking/${createdBooking.id}`).set("Authorization", `Bearer ${token}`).send(body);
+
+      expect(response.status).toBe(httpStatus.FORBIDDEN);
+    });
+
+    it("should respond with status 200 and update room", async () => {
+      const user = await createUser();
+      const token = await generateValidToken(user);
+      // const enrollment = await createEnrollmentWithAddress(user);
+      // const ticketType = await createTicketTypeWithHotel();
+      // const ticket = await createTicket(enrollment.id, ticketType.id, TicketStatus.PAID);
+      // const payment = await createPayment(ticket.id, ticketType.price);
+      const createdHotel = await createHotel();
+      const createdRoom = await createRoomWithHotelId(createdHotel.id);
+      const createdBooking = await createBooking(user.id, createdRoom.id);
+      const newRoom = await createRoomWithHotelId(createdHotel.id);
+      const body = { roomId: newRoom.id };
+
+      const response = await server.put(`/booking/${createdBooking.id}`).set("Authorization", `Bearer ${token}`).send(body);
+
+      expect(response.status).toBe(httpStatus.OK);
+      expect(response.body).toEqual({
+        bookingId: expect.any(Number),
+      });
+    });
   });
 });

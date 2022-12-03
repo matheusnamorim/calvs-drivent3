@@ -47,13 +47,20 @@ async function updateBooking(userId: number, bookingId: number, roomId: number) 
   const booking = await bookingRepository.findBookingById(bookingId);
   if(!booking) throw notFoundError();
 
+  if(booking.userId !== userId) throw forbiddenError();
+
   const resultRoom = await bookingRepository.findRoomId(roomId);
   if(!resultRoom) throw notFoundError();
 
   const bookings = await bookingRepository.findManyBooking(roomId);
   if(resultRoom.capacity === bookings.length) throw forbiddenError();
 
-  return;
+  const result = await bookingRepository.updateBooking(bookingId, roomId);
+  
+  const resultBooking = { ...exclude(result, "userId", "createdAt", "updatedAt", "roomId"), };
+  return {
+    bookingId: resultBooking.id
+  };
 }
 
 const bookingService = {
